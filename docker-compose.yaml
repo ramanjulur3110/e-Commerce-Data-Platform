@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:17-bookworm
+    container_name: generator_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  
+  generator:
+    container_name: order_generator_app
+    build:
+      context: .
+      dockerfile: Dockerfile.generator
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  payment-processor:
+    container_name: payment_processor_app
+    build:
+      context: .
+      dockerfile: Dockerfile.payment-processor
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

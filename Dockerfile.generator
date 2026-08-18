@@ -1,0 +1,17 @@
+FROM python:3.13-slim
+WORKDIR /app
+
+# Install uv
+RUN pip install --no-cache-dir uv
+
+# Copy dependency files first so Docker can cache the install layer 
+COPY pyproject.toml uv.lock ./
+
+# Install project dependencies into the container
+RUN uv sync --frozen --no-dev
+
+# Copy the application code
+COPY src ./src
+
+# 4. Run the Python file when the container starts
+CMD ["/app/.venv/bin/python", "-u", "-m", "src.generator.bootstrap_generator"]
