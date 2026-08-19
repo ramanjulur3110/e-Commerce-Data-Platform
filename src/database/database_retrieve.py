@@ -3,11 +3,11 @@ from psycopg.rows import dict_row
 import os
 
 DB_PARAMS = {
-    'dbname': os.getenv("DB_NAME", "mydatabase"),
-    'user': os.getenv("DB_USER", "admin"),
-    'password': os.getenv("DB_PASSWORD", "admin"),
-    'host': os.getenv("DB_HOST", "localhost"),
-    'port': int(os.getenv("DB_PORT", "5433"))
+    "host": os.getenv("DB_HOST"),
+    "port": os.getenv("DB_PORT"),
+    "dbname": os.getenv("DB_NAME"),
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
 }
 
 def truncate_prod_tables():

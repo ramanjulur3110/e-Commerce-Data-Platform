@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: mydatabase
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5433:5432"
     volumes:
@@ -20,8 +20,12 @@ services:
     environment:
       DB_HOST: db
       DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${ORDER_GENERATOR_DB_USER}
+      DB_PASSWORD: ${ORDER_GENERATOR_DB_PASSWORD}
     depends_on:
       - db
+    # command: ["--truncate"]
     restart: unless-stopped
 
   payment-processor:
@@ -32,6 +36,9 @@ services:
     environment:
       DB_HOST: db
       DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${PAYMENT_PROCESSOR_DB_USER}
+      DB_PASSWORD: ${PAYMENT_PROCESSOR_DB_PASSWORD}
     depends_on:
       - db
     restart: unless-stopped

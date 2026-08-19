@@ -3,10 +3,20 @@ from src.database.database_retrieve import retrieve_all_customers, retrieve_all_
 from src.database.database_insert import order_generator_inserts
 from src.common.utils import reset_batch_metadata
 import random
+import argparse
 import signal
 import time
 
 running = True
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--truncate",
+    action="store_true",
+    help="Truncate generator tables before starting"
+)
+
+args = parser.parse_args()
 
 def handle_interrupt(signum, frame):
     global running
@@ -58,8 +68,7 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, handle_interrupt)
     signal.signal(signal.SIGTERM, handle_interrupt)
 
-    truncate_tables = True
-    if truncate_tables:
+    if args.truncate:
         truncate_prod_tables()
         print("truncate_tables flag set to True.")
         print("Truncated the following tables:\n#1. generator.orders\n#2. generator.order_details\n#3. generator.order_status_history\n#4. generator.payment_orders\n#5. generator.payment_orders_state_history")

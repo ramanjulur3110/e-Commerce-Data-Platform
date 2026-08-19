@@ -22,13 +22,13 @@ def main():
 
         conn = psycopg.connect(**DB_PARAMS, row_factory=dict_row)
         cur = conn.cursor()
-        print("Updating Final Statuses for Appoved Orders")
+        print("Updating Final Statuses for Approved Orders")
         update_final_statuses(cur, approved_list, 'PAID', 'APPROVED')
 
         print("Updating Final Statuses for Declined Orders")
         update_final_statuses(cur, declined_list, 'CANCELLED', 'DECLINED')
 
-        print("Updating Statuses for Timeout Orders. NOTE: After 3 failed attempts an order id DECLINED/CANCELLED")
+        print("Updating Statuses for Timeout Orders. NOTE: After 3 failed attempts an order is DECLINED/CANCELLED")
         update_final_statuses_timeout(cur, timeout_list, 'TIMEOUT')
         conn.commit()
 
@@ -36,7 +36,7 @@ def main():
         elapsed_seconds = end_time - start_time
         print(f"\nTotal Payment Processing Time: {elapsed_seconds:.6f} seconds")
     else:
-        print("Less than 100 available to process. Skipping current run.")
+        print("Less than 100 orders available to process. Skipping current run.")
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, handle_interrupt)

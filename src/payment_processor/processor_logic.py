@@ -6,11 +6,11 @@ import random
 import os
 
 DB_PARAMS = {
-    'dbname': os.getenv("DB_NAME", "mydatabase"),
-    'user': os.getenv("DB_USER", "admin"),
-    'password': os.getenv("DB_PASSWORD", "admin"),
-    'host': os.getenv("DB_HOST", "localhost"),
-    'port': int(os.getenv("DB_PORT", "5433"))
+    "host": os.getenv("DB_HOST"),
+    "port": os.getenv("DB_PORT"),
+    "dbname": os.getenv("DB_NAME"),
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
 }
 
 def retrieve_orders_to_process_payment():
@@ -104,7 +104,7 @@ def retrieve_orders_to_process_payment():
                     approved_list.append({'order_id':x['order_id'], 'payment_order_id':x['payment_order_id'], 'current_status':x['payment_status'], 'new_status':new_status, 'attempts':x['attempts']})
 
         print(f"\nThis batch is processing 100 orders (starting with oldest first)")
-        print(f"Aopproved Orders: {len(approved_list)}")
+        print(f"Approved Orders: {len(approved_list)}")
         print(f"Declined Orders: {len(declined_list)}")
         print(f"Timeout Orders: {len(timeout_list)}")
 
@@ -117,6 +117,9 @@ def update_inital_statuses(order_list):
     conn = psycopg.connect(**DB_PARAMS, row_factory=dict_row)
     cur = conn.cursor()
 
+    # for x in order_list:
+    #     print (x)
+
     payment_id_list = []
     order_id_list = []
     for x in order_list:
@@ -126,17 +129,21 @@ def update_inital_statuses(order_list):
     placeholders_orders = ', '.join(['%s'] * len(order_id_list))
     placeholders_payments = ', '.join(['%s'] * len(payment_id_list))
 
-    query = f"UPDATE generator.orders SET order_status = 'PAYMENT PROCESSING', updated_at = CURRENT_TIMESTAMP WHERE order_id IN ({placeholders_orders})"
-    cur.execute(query, order_id_list)
+    if order_id_list:
+        query = f"UPDATE generator.orders SET order_status = 'PAYMENT PROCESSING', updated_at = CURRENT_TIMESTAMP WHERE order_id IN ({placeholders_orders})"
+        cur.execute(query, order_id_list)
 
-    query = f"UPDATE generator.payment_orders SET payment_status = 'PROCESSING', updated_at = CURRENT_TIMESTAMP WHERE order_id IN ({placeholders_orders})"
-    cur.execute(query, order_id_list)
+    if payment_id_list:
+        query = f"UPDATE generator.payment_orders SET payment_status = 'PROCESSING', updated_at = CURRENT_TIMESTAMP WHERE order_id IN ({placeholders_orders})"
+        cur.execute(query, order_id_list)
 
-    query = f"UPDATE generator.order_status_history SET effective_end_at = CURRENT_TIMESTAMP, is_current = FALSE WHERE order_id IN ({placeholders_orders}) AND is_current = TRUE"
-    cur.execute(query, order_id_list)
+    if order_id_list:
+        query = f"UPDATE generator.order_status_history SET effective_end_at = CURRENT_TIMESTAMP, is_current = FALSE WHERE order_id IN ({placeholders_orders}) AND is_current = TRUE"
+        cur.execute(query, order_id_list)
 
-    query = f"UPDATE generator.payment_status_history SET effective_end_at = CURRENT_TIMESTAMP, is_current = FALSE WHERE payment_order_id IN ({placeholders_payments}) AND is_current = TRUE"
-    cur.execute(query, payment_id_list)
+    if payment_id_list:
+        query = f"UPDATE generator.payment_status_history SET effective_end_at = CURRENT_TIMESTAMP, is_current = FALSE WHERE payment_order_id IN ({placeholders_payments}) AND is_current = TRUE"
+        cur.execute(query, payment_id_list)
 
     insert_into_order_history_tuple = []
     for x in order_list:

@@ -14,4 +14,4 @@ RUN uv sync --frozen --no-dev
 COPY src ./src
 
 # 4. Run the Python file when the container starts
-CMD ["/app/.venv/bin/python", "-u", "-m", "src.generator.bootstrap_generator"]
+ENTRYPOINT ["/app/.venv/bin/python", "-u", "-m", "src.generator.bootstrap_generator"]
