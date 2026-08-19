@@ -1,5 +1,11 @@
 # E-Commerce Data Platform
+![Python](https://img.shields.io/badge/Python-3.13-blue)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-blue)
+![Docker](https://img.shields.io/badge/Docker-Compose-blue)
+![Phase](https://img.shields.io/badge/Phase_1-Complete-brightgreen)
+![Status](https://img.shields.io/badge/Status-Active_Development-orange)
 ![E-Commerce Data Platform Architecture](images/hero_banner_ecommerce_platform.png)
+
 
 ## Project Roadmap
 
